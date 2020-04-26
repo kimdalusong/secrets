@@ -4,7 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require("ejs");
 const mongoose = require('mongoose');
-const encrypt = require('mongoose-encryption');
+const md5 = require('md5');
 
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true, useUnifiedTopology: true});
 
@@ -21,9 +21,6 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String
 });
-
-const secret = "Thisisourlittlesecret.";
-userSchema.plugin(encrypt, {secret: secret, encryptedFields: ["password"] });
 
 
 //Model
@@ -46,7 +43,7 @@ app.get("/register", (req, res)=> {
 app.post("/register", (req, res)=>{
     const newUser = new User({
         email: req.body.username,
-        password: req.body.password
+        password: md5(req.body.password)
     });
 
     newUser.save((err)=>{
@@ -60,7 +57,7 @@ app.post("/register", (req, res)=>{
 
 app.post("/login", (req, res)=> {
     const username = req.body.username;
-    const password = req.body.password;
+    const password = md5(req.body.password);
 
     User.findOne({email: username}, (err, foundItem)=>{
         if (err){
@@ -69,6 +66,8 @@ app.post("/login", (req, res)=> {
             if (foundItem){
                 if (foundItem.password === password){
                     res.render("secrets");
+                } else {
+                    res.send("Incorrect Email or Password");
                 }
             }
         }
