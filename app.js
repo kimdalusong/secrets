@@ -29,7 +29,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex: true});
+mongoose.connect("mongodb+srv://admin-jasper:kimjasper05@cluster0-caozn.mongodb.net/secretDB", {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex: true});
 
 
 //Schema
@@ -53,6 +53,7 @@ passport.use(User.createStrategy());
 passport.serializeUser(function(user, done) {
     done(null, user._id);
 });
+
 passport.deserializeUser(function(id, done) {
   User.findById(id, function(err, user) {
     done(err, user);
@@ -195,6 +196,6 @@ app.post("/submit", function(req, res){
 
 
 
-app.listen(3000, function(){
+app.listen(process.env.PORT || 3000, function(){
     console.log("Server Started on port 3000");
 });
